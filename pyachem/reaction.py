@@ -9,11 +9,11 @@ class Reaction(typing.Generic[T]):
     # TODO use __new__ and weakref to prevent duplicates
     # see https://docs.python.org/3/reference/datamodel.html#object.__new__
     # see https://docs.python.org/3/library/weakref.html#weakref.WeakValueDictionary
-    # TODO implement comparisons
-    # TODO implement hash
     reactants = ()
     products = ()
     rate = 1.0
+    __hash = None  # store hash once calculated
+    __key = ()  # store common key used for equality, ordering, hashing
 
     def __init__(
         self,
@@ -25,6 +25,8 @@ class Reaction(typing.Generic[T]):
         self.products = tuple(sorted(products))
         self.rate = rate
 
+        self.__key = (self.reactants, self.products, self.rate)
+
     def __repr__(self):
         return f"Reaction({self.reactants}, {self.products}, {self.rate})"
 
@@ -32,28 +34,19 @@ class Reaction(typing.Generic[T]):
         if self is other:
             return True
 
-        if self.reactants != other.reactants:
-            return False
-        if self.products != other.products:
-            return False
-        if self.rate != other.rate:
-            return False
-
-        # no problems, must be the same
-        return True
+        return self.__key == other.__key
 
     def __lt__(self, other):
         if self is other:
             return False
 
-        if self.reactants < other.reactants:
-            return True
-        if self.products < other.products:
-            return True
-        if self.rate < other.rate:
-            return True
+        return self.__key < other.__key
 
-        return False
+    def __hash__(self):
+        if not self.__hash:
+            self.__hash = hash(self.__key)
+
+        return self.__hash
 
 
 @functools.total_ordering
@@ -61,14 +54,16 @@ class ReactionEvent(typing.Generic[T]):
     # TODO use __new__ and weakref to prevent duplicates
     # see https://docs.python.org/3/reference/datamodel.html#object.__new__
     # see https://docs.python.org/3/library/weakref.html#weakref.WeakValueDictionary
-    # TODO implement comparisons
-    # TODO implement hash
     reaction = None
     time = 0.0
+    __hash = None  # store hash once calculated
+    __key = ()  # store common key used for equality, ordering, hashing
 
     def __init__(self, reaction: Reaction[T], time: float):
         self.reaction = reaction
         self.time = time
+
+        self.__key = (self.time, self.reaction)
 
     def __repr__(self):
         return f"ReactionEvent({self.reaction}, {self.time})"
@@ -77,21 +72,16 @@ class ReactionEvent(typing.Generic[T]):
         if self is other:
             return True
 
-        if self.reaction != other.reaction:
-            return False
-        if self.time != other.time:
-            return False
-
-        # no problems, must be the same
-        return True
+        return self.__key == other.__key
 
     def __lt__(self, other):
         if self is other:
             return False
 
-        if self.time < other.time:
-            return True
-        if self.reaction < other.reaction:
-            return True
+        return self.__key < other.__key
 
-        return False
+    def __hash__(self):
+        if not self.__hash:
+            self.__hash = hash(self.__key)
+
+        return self.__hash
