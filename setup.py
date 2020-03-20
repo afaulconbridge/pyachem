@@ -17,6 +17,7 @@ setup(
             "pip-tools",
             "pipdeptree",
             "pre-commit",
+            "mypy",
         ],
     },
 )
