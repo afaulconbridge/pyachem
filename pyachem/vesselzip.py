@@ -48,10 +48,15 @@ class VesselZip(VesselBase):
             pair = next(self.zipped)
 
         reaction = self.achem.react(pair, self.rng)
-
-        self.contents_next.extend(reaction.products)
-        reaction_event = ReactionEvent(reaction, self.time)
-        return reaction_event
+        if reaction:
+            self.contents_next.extend(reaction.products)
+            reaction_event = ReactionEvent(reaction, self.time)
+            return reaction_event
+        else:
+            # elastic collision move to next time step
+            self.contents_next.extend(pair)
+            # TODO loop not recursion
+            return self.__next__()
 
 
 # TODO implement VesselSingle as a one-at-a-time random vessel

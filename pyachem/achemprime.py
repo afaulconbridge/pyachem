@@ -18,7 +18,7 @@ class AChemPrime(AChem):
 
         if b % a:
             # has a remainder, elastic reaction
-            return Reaction(molecules, molecules)
+            return None
         else:
             c = b // a
             return Reaction((a, b), (a, c))

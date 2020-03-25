@@ -15,12 +15,14 @@ class AChem(typing.Generic[T], abc.ABC):
     """
 
     @abc.abstractmethod
-    def react(self, molecules: typing.Iterable[T], rng: random.Random) -> Reaction[T]:
+    def react(
+        self, molecules: typing.Iterable[T], rng: random.Random
+    ) -> typing.Optional[Reaction[T]]:
         """
         May be implemented by subclasses to enable simulation
         of reaction network.
 
-        Elastic reactions return the reactants as the products.
+        Elastic reactions returns None
         """
         raise NotImplementedError
 
