@@ -8,7 +8,7 @@ setup(
     packages=["pyachem"],
     description="Artificial Chemistry utilities and algorithms.",
     long_description=open("README.md").read(),
-    install_requires=[""],
+    install_requires=["python-igraph"],
     extras_require={
         "dev": [
             "pytest-cov",
