@@ -89,22 +89,28 @@ class VesselCombinatoric(VesselBase):
         super(VesselCombinatoric, self).__init__(achem)
         self.seen = list(contents)
         self.pending = list(itertools.combinations_with_replacement(contents, 2))
+        self.reactions = []
 
     def __next__(self):
-        if len(self.pending) == 0:
-            raise StopIteration
 
-        reactants = self.pending.pop()
-        for reaction in self.achem.all_reactions(reactants):
-            # if it wasn't an elastic reaction
-            if reaction is not None:
-                yield ReactionEvent(reaction, 0.0)
-                # add any potential new reactants
-                for product in reaction.products:
-                    if product not in self.seen:
-                        self.seen.append(product)
-                        # this will include self reaction
-                        self.pending.extend(itertools.product([product], self.seen))
+        while not len(self.reactions):
+            if len(self.pending) == 0:
+                raise StopIteration
+            reactants = self.pending.pop()
+            self.reactions = self.achem.all_reactions(reactants)
+
+        reaction = self.reactions.pop()
+
+        # if it wasn't an elastic reaction
+        if reaction is not None:
+            # add any potential new reactants
+            for product in reaction.products:
+                if product not in self.seen:
+                    self.seen.append(product)
+                    # this will include self reaction
+                    self.pending.extend(itertools.product([product], self.seen))
+
+        return reaction
 
 
 # TODO implement VesselSingle as a one-at-a-time random vessel
