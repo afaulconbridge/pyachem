@@ -1,6 +1,7 @@
 import itertools
 import random
 
+import pytest
 from pyachem import Reaction, ReactionEvent, VesselZip
 from pyachem.achemprime import AChemPrime
 
@@ -15,7 +16,12 @@ def test_reactions():
 
 
 def test_vesselzip():
-    achem = AChemPrime()
-    vessel = VesselZip(achem, range(2, 5 + 1), random.Random(42))
+    vessel = VesselZip(AChemPrime(), [2, 4], random.Random(42))
     reaction = next(vessel)
-    assert reaction == ReactionEvent(Reaction((3, 4), (3, 4), 1.0), 1.0)
+    assert reaction == ReactionEvent(Reaction((2, 4), (2, 2), 1.0), 1.0)
+
+
+def test_vesselzip_terminate():
+    vessel = VesselZip(AChemPrime(), [2, 2], random.Random(42))
+    with pytest.raises(StopIteration):
+        reaction = next(vessel)
