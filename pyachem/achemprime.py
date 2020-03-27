@@ -16,8 +16,8 @@ class AChemPrime(AChem):
         if rng.random() < 0.5:
             a, b = b, a
 
-        if b % a:
-            # has a remainder, elastic reaction
+        if b == a or b % a:
+            # same, or has a remainder, elastic reaction
             return None
         else:
             c = b // a
